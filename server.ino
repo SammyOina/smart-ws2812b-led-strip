@@ -16,6 +16,8 @@ WiFiUDP Udp;
 #endif
 
 int LED = LED_BUILTIN;
+char packetBuffer[255];
+int actions[4];
 
 void tick()
 {
@@ -71,22 +73,8 @@ void setup() {
 
   Udp.begin(UDP_PORT);
 }
-uint8_t a2iRes=0;
-void a2i(char c) {
-  a2iRes*=10;
-  a2iRes+=(uint8_t) c - '0';
-}
-uint16_t c2iRes=0;
-void c2i(char c) {
-  c2iRes*=255;
-  c2iRes+=(uint8_t) c - 1;
-}
 void loop() {
-  char c;
-  uint8_t state=0;
   uint16_t packetSize = Udp.parsePacket();
-  uint16_t led=0;
-  uint8_t colors[3]={0,0,0};
   if (packetSize) {
 
     Serial.print("Received packet of size ");
@@ -94,6 +82,22 @@ void loop() {
     Serial.print(" from ");
     IPAddress remoteIp = Udp.remoteIP();
     Serial.println(remoteIp);
+
+    while(Udp.available()){
+      int len = Udp.read(packetBuffer, 255);
+      if (len > 0) {
+        packetBuffer[len] = 0;
+      }
+      int ipos = 0;
+      char *tok = strtok(packetBuffer, ",");
+      while (tok){
+        if (ipos < 4) {
+          actions[ipos++] = atoi(tok);
+        }
+       tok = strtok(NULL, ",");
+      }
+      //Serial.print(actions[0]);
+    }
   }
   Udp.flush();
 
