@@ -1,5 +1,6 @@
 import socket
 from spectrum import SpectrumAnalyzer
+from colourGenerator import getColour
 
 #create spectrum analyzer
 spec = SpectrumAnalyzer()
@@ -14,22 +15,24 @@ def get_ips_for_host(host):
 
 UDP_IP_ADDRESS = ''.join([str(elem) for elem in get_ips_for_host('ESP-6BFDB0.mshome.net')[2]])
 UDP_PORT_NO = 3000
-message = "23,2,3,4"
 
 clientSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 try:
     while True:
+        message = ""
         spec.data = spec.audioinput()
         spec.fft()
-        spec.graphplot()
-        print("sub bass: ", max(spec.spec_y[0:2]))
-        print("bass: ", max(spec.spec_y[3:8]))
-        print("low mid: ", max(spec.spec_y[9:16]))
-        print("mid: ", max(spec.spec_y[17:64]))
-        print("upper mid: ", max(spec.spec_y[65:128]))
-        print("presence: ", max(spec.spec_y[129:192]))
-        print("brilliance:", max(spec.spec_y[193:255]))
+        #spec.graphplot()
+        message =  message + getColour(max(spec.spec_y[0:2]), 0)
+        message =  message + getColour(max(spec.spec_y[3:8]), 1)
+        message =  message + getColour(max(spec.spec_y[9:16]), 2)
+        message =  message + getColour(max(spec.spec_y[17:64]), 3)
+        message =  message + getColour(max(spec.spec_y[65:128]), 4)
+        message =  message + getColour(max(spec.spec_y[129:192]), 5)
+        message =  message + getColour(max(spec.spec_y[193:255]), 6)
+
+        message = message.rstrip(',')
 
         clientSock.sendto(str.encode(message), (UDP_IP_ADDRESS, UDP_PORT_NO))
 except KeyboardInterrupt:

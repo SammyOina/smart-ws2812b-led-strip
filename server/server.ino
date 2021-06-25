@@ -3,6 +3,12 @@
 #include <WiFiManager.h> // https://github.com/tzapu/WiFiManager
 #include <WiFiUdp.h>
 
+//neopixel set up
+#include <Adafruit_NeoPixel.h>
+#define LED_PIN    D6
+#define LED_COUNT 150
+Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
+
 //for LED status
 #include <Ticker.h>
 Ticker ticker;
@@ -17,7 +23,7 @@ WiFiUDP Udp;
 
 int LED = LED_BUILTIN;
 char packetBuffer[255];
-int actions[4];
+int actions[28];
 
 void tick()
 {
@@ -36,6 +42,10 @@ void configModeCallback (WiFiManager *myWiFiManager) {
 }
 
 void setup() {
+  strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
+  strip.show();            // Turn OFF all pixels ASAP
+  strip.setBrightness(50);
+  
   WiFi.mode(WIFI_STA); // explicitly set mode, esp defaults to STA+AP
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -91,13 +101,41 @@ void loop() {
       int ipos = 0;
       char *tok = strtok(packetBuffer, ",");
       while (tok){
-        if (ipos < 4) {
+        if (ipos < 28) {
           actions[ipos++] = atoi(tok);
         }
        tok = strtok(NULL, ",");
       }
       //Serial.print(actions[0]);
     }
+    for(int i = 0; i<21; i++) {
+        strip.setPixelColor(i, strip.Color(actions[1], actions[2], actions[3]));
+        strip.show();
+      }
+      for(int i = 21; i<43; i++) {
+        strip.setPixelColor(i, strip.Color(actions[5], actions[6], actions[7]));
+        strip.show();
+      }
+      for(int i = 43; i<65; i++) {
+        strip.setPixelColor(i, strip.Color(actions[9], actions[10], actions[11]));
+        strip.show();
+      }
+      for(int i = 65; i<87; i++) {
+        strip.setPixelColor(i, strip.Color(actions[13], actions[14], actions[15]));
+        strip.show();
+      }
+      for(int i = 87; i<108; i++) {
+        strip.setPixelColor(i, strip.Color(actions[17], actions[18], actions[19]));
+        strip.show();
+      }
+      for(int i = 108; i<129; i++) {
+        strip.setPixelColor(i, strip.Color(actions[21], actions[22], actions[23]));
+        strip.show();
+      }
+      for(int i = 129; i<strip.numPixels(); i++) {
+        strip.setPixelColor(i, strip.Color(actions[25], actions[26], actions[27]));
+        strip.show();
+      }
   }
   Udp.flush();
 
