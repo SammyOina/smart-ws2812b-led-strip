@@ -23,7 +23,7 @@ try:
         message = ""
         spec.data = spec.audioinput()
         spec.fft()
-        #spec.graphplot()
+        spec.graphplot()
         message =  message + getColour(max(spec.spec_y[0:2]), 0)
         message =  message + getColour(max(spec.spec_y[3:8]), 1)
         message =  message + getColour(max(spec.spec_y[9:16]), 2)
