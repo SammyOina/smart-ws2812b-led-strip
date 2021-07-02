@@ -44,7 +44,7 @@ try:
             message = message.rstrip(',')
             print(len(message))
             clientSock.sendto(str.encode(message), (UDP_IP_ADDRESS, UDP_PORT_NO))
-        sleep(0.25)
+            sleep(0.005)
 except KeyboardInterrupt:
     spec.pa.close()
     print("End...")

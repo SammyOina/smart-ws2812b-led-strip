@@ -22,7 +22,7 @@ WiFiUDP Udp;
 #endif
 
 int LED = LED_BUILTIN;
-char packetBuffer[15];
+char packetBuffer[2250];
 int actions[4];
 
 void tick()
@@ -94,7 +94,7 @@ void loop() {
     Serial.println(remoteIp);
 
     while(Udp.available()){
-      int len = Udp.read(packetBuffer, 15);
+      int len = Udp.read(packetBuffer, 2250);
       if (len > 0) {
         packetBuffer[len] = 0;
       }
