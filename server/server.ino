@@ -22,8 +22,8 @@ WiFiUDP Udp;
 #endif
 
 int LED = LED_BUILTIN;
-char packetBuffer[97];
-int actions[28];
+char packetBuffer[15];
+int actions[4];
 
 void tick()
 {
@@ -94,48 +94,21 @@ void loop() {
     Serial.println(remoteIp);
 
     while(Udp.available()){
-      int len = Udp.read(packetBuffer, 97);
+      int len = Udp.read(packetBuffer, 15);
       if (len > 0) {
         packetBuffer[len] = 0;
       }
       int ipos = 0;
       char *tok = strtok(packetBuffer, ",");
       while (tok){
-        if (ipos < 28) {
+        if (ipos < 4) {
           actions[ipos++] = atoi(tok);
         }
        tok = strtok(NULL, ",");
       }
-      //Serial.print(actions[0]);
-    }
-    for(int i = 0; i<21; i++) {
-        strip.setPixelColor(i, strip.Color(actions[1], actions[2], actions[3]));
-        strip.show();
-      }
-      for(int i = 21; i<43; i++) {
-        strip.setPixelColor(i, strip.Color(actions[5], actions[6], actions[7]));
-        strip.show();
-      }
-      for(int i = 43; i<65; i++) {
-        strip.setPixelColor(i, strip.Color(actions[9], actions[10], actions[11]));
-        strip.show();
-      }
-      for(int i = 65; i<87; i++) {
-        strip.setPixelColor(i, strip.Color(actions[13], actions[14], actions[15]));
-        strip.show();
-      }
-      for(int i = 87; i<108; i++) {
-        strip.setPixelColor(i, strip.Color(actions[17], actions[18], actions[19]));
-        strip.show();
-      }
-      for(int i = 108; i<129; i++) {
-        strip.setPixelColor(i, strip.Color(actions[21], actions[22], actions[23]));
-        strip.show();
-      }
-      for(int i = 129; i<strip.numPixels(); i++) {
-        strip.setPixelColor(i, strip.Color(actions[25], actions[26], actions[27]));
-        strip.show();
-      }
+      strip.setPixelColor(actions[0], strip.Color(actions[1], actions[2], actions[3]));
+      strip.show();
+    } 
   }
   Udp.flush();
 

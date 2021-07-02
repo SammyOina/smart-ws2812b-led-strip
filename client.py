@@ -1,4 +1,5 @@
 import socket
+from time import sleep
 from spectrum import SpectrumAnalyzer
 from colourGenerator import getColour
 
@@ -24,17 +25,26 @@ try:
         spec.data = spec.audioinput()
         spec.fft()
         spec.graphplot()
-        message =  message + getColour(max(spec.spec_y[0:2]), 0)
-        message =  message + getColour(max(spec.spec_y[3:8]), 1)
-        message =  message + getColour(max(spec.spec_y[9:16]), 2)
-        message =  message + getColour(max(spec.spec_y[17:64]), 3)
-        message =  message + getColour(max(spec.spec_y[65:128]), 4)
-        message =  message + getColour(max(spec.spec_y[129:192]), 5)
-        message =  message + getColour(max(spec.spec_y[193:255]), 6)
-
-        message = message.rstrip(',')
-
-        clientSock.sendto(str.encode(message), (UDP_IP_ADDRESS, UDP_PORT_NO))
+        for x in range(150):
+            message = str(x)
+            if x >= 129:
+                message =  message + getColour(max(spec.spec_y[193:255]), 6)
+            elif x >= 108:
+                message =  message + getColour(max(spec.spec_y[129:192]), 5)
+            elif  x >= 87:
+                message =  message + getColour(max(spec.spec_y[65:128]), 4)
+            elif x >= 65:
+                message =  message + getColour(max(spec.spec_y[17:64]), 3)
+            elif x >= 43:
+                message =  message + getColour(max(spec.spec_y[9:16]), 2)
+            elif x >= 21:
+                message =  message + getColour(max(spec.spec_y[3:8]), 1)
+            else:
+                message =  message + getColour(max(spec.spec_y[0:2]), 0)
+            message = message.rstrip(',')
+            print(len(message))
+            clientSock.sendto(str.encode(message), (UDP_IP_ADDRESS, UDP_PORT_NO))
+        sleep(0.25)
 except KeyboardInterrupt:
     spec.pa.close()
     print("End...")

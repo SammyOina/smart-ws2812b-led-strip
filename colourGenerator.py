@@ -15,12 +15,12 @@ def getColour(intensity, region):
     [",255,000,000,", ",205,092,092,", ",233,150,122,", ",250,128,114,"]]
 
     if (intensity < 1):
-        return str(region) + ",000,000,000,"
+        return ",000,000,000,"
     elif (intensity > 75):
-        return str(region) + coloursRef[region][3]
+        return coloursRef[region][3]
     elif (intensity > 50):
-        return str(region) + coloursRef[region][2]
+        return coloursRef[region][2]
     elif (intensity > 25):
-        return str(region) + coloursRef[region][1]
+        return coloursRef[region][1]
     else:
-        return str(region) + coloursRef[region][0]
+        return coloursRef[region][0]
