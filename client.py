@@ -1,6 +1,7 @@
 import socket
 from spectrum import SpectrumAnalyzer
 from colourGenerator import getColour
+from time import sleep
 
 #create spectrum analyzer
 spec = SpectrumAnalyzer()
@@ -23,7 +24,7 @@ try:
         message = ""
         spec.data = spec.audioinput()
         spec.fft()
-        spec.graphplot()
+        #spec.graphplot()
         message =  message + getColour(max(spec.spec_y[0:2]), 0)
         message =  message + getColour(max(spec.spec_y[3:8]), 1)
         message =  message + getColour(max(spec.spec_y[9:16]), 2)
@@ -35,6 +36,7 @@ try:
         message = message.rstrip(',')
 
         clientSock.sendto(str.encode(message), (UDP_IP_ADDRESS, UDP_PORT_NO))
+        #sleep(0.8)
 except KeyboardInterrupt:
     spec.pa.close()
     print("End...")
