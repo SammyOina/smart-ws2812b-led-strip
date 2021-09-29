@@ -7,7 +7,7 @@
 #include <Adafruit_NeoPixel.h>
 #define LED_PIN    D6
 #define LED_COUNT 150
-Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_RBG + NEO_KHZ800);
 
 //for LED status
 #include <Ticker.h>
@@ -23,7 +23,7 @@ WiFiUDP Udp;
 
 int LED = LED_BUILTIN;
 char packetBuffer[2250];
-int actions[4];
+int actions[5];
 
 void tick()
 {
@@ -93,7 +93,7 @@ void loop() {
     IPAddress remoteIp = Udp.remoteIP();
     Serial.println(remoteIp);
 
-    while(Udp.available()){
+    //while(Udp.available()){
       int len = Udp.read(packetBuffer, 2250);
       if (len > 0) {
         packetBuffer[len] = 0;
@@ -106,9 +106,11 @@ void loop() {
         }
        tok = strtok(NULL, ",");
       }
-      strip.setPixelColor(actions[0], strip.Color(actions[1], actions[2], actions[3]));
-      strip.show();
-    } 
+      for(int i = actions[0]; i < actions[1]; i++){
+        strip.setPixelColor(i, strip.Color(actions[2], actions[3], actions[4]));
+        strip.show();
+      }
+    //} 
   }
   Udp.flush();
 
