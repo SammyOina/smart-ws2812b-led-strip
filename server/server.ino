@@ -1,29 +1,32 @@
 // LED will blink when in config mode
-
-#include <WiFiManager.h> // https://github.com/tzapu/WiFiManager
+#include <Arduino.h>
+#include <WiFiManager.h>
 #include <WiFiUdp.h>
 
 //neopixel set up
-#include <Adafruit_NeoPixel.h>
-#define LED_PIN    D6
-#define LED_COUNT 150
-Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_RBG + NEO_KHZ800);
+#include <NeoPixelBus.h>
+
+#define NUM_LEDS 150
+#define BUFFER_LEN 1024
+#define PRINT_FPS 1
+const uint8_t PixelPin = 3;
+NeoPixelBus<NeoGrbFeature, Neo800KbpsMethod> ledstrip(NUM_LEDS, PixelPin);
+
+unsigned int localPort = 7777;
+char packetBuffer[BUFFER_LEN];
 
 //for LED status
 #include <Ticker.h>
 Ticker ticker;
 
-WiFiUDP Udp;
+WiFiUDP port;
 
-#define UDP_PORT 3000
 
 #ifndef LED_BUILTIN
 #define LED_BUILTIN 13 // ESP32 DOES NOT DEFINE LED_BUILTIN
 #endif
 
 int LED = LED_BUILTIN;
-char packetBuffer[2250];
-int actions[5];
 
 void tick()
 {
@@ -42,9 +45,6 @@ void configModeCallback (WiFiManager *myWiFiManager) {
 }
 
 void setup() {
-  strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
-  strip.show();            // Turn OFF all pixels ASAP
-  strip.setBrightness(50);
   
   WiFi.mode(WIFI_STA); // explicitly set mode, esp defaults to STA+AP
   // put your setup code here, to run once:
@@ -81,37 +81,40 @@ void setup() {
   //keep LED on
   digitalWrite(LED, LOW);
 
-  Udp.begin(UDP_PORT);
+  port.begin(localPort);
+  ledstrip.Begin();//Begin output
+  ledstrip.Show();//Clear the strip for use
 }
+uint8_t N = 0;
+#if PRINT_FPS
+    uint16_t fpsCounter = 0;
+    uint32_t secondTimer = 0;
+#endif
+
 void loop() {
-  uint16_t packetSize = Udp.parsePacket();
-  if (packetSize) {
-
-    Serial.print("Received packet of size ");
-    Serial.print(packetSize);
-    Serial.print(" from ");
-    IPAddress remoteIp = Udp.remoteIP();
-    Serial.println(remoteIp);
-
-    //while(Udp.available()){
-      int len = Udp.read(packetBuffer, 2250);
-      if (len > 0) {
-        packetBuffer[len] = 0;
-      }
-      int ipos = 0;
-      char *tok = strtok(packetBuffer, ",");
-      while (tok){
-        if (ipos < 4) {
-          actions[ipos++] = atoi(tok);
-        }
-       tok = strtok(NULL, ",");
-      }
-      for(int i = actions[0]; i < actions[1]; i++){
-        strip.setPixelColor(i, strip.Color(actions[2], actions[3], actions[4]));
-        strip.show();
-      }
-    //} 
-  }
-  Udp.flush();
+  // Read data over socket
+    int packetSize = port.parsePacket();
+    // If packets have been received, interpret the command
+    if (packetSize) {
+        int len = port.read(packetBuffer, BUFFER_LEN);
+        for(int i = 0; i < len; i+=4) {
+            packetBuffer[len] = 0;
+            N = packetBuffer[i];
+            RgbColor pixel((uint8_t)packetBuffer[i+1], (uint8_t)packetBuffer[i+2], (uint8_t)packetBuffer[i+3]);
+            ledstrip.SetPixelColor(N, pixel);
+        } 
+        ledstrip.Show();
+        #if PRINT_FPS
+            fpsCounter++;
+            Serial.print("/");//Monitors connection(shows jumps/jitters in packets)
+        #endif
+    }
+    #if PRINT_FPS
+        if (millis() - secondTimer >= 1000U) {
+            secondTimer = millis();
+            Serial.printf("FPS: %d\n", fpsCounter);
+            fpsCounter = 0;
+        }   
+    #endif
 
 }
