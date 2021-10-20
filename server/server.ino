@@ -51,7 +51,7 @@ extern const unsigned int caCertLen;
 void setClock() {
    // Set time via NTP, as required for x.509 validation
   configTime(3 * 3600, 0, "pool.ntp.org", "time.nist.gov");
-  Serial.print("Waiting for NTP time sync: ");
+  //Serial.print("Waiting for NTP time sync: ");
   time_t now = time(nullptr);
   while (now < 8 * 3600 * 2) {
     delay(500);
@@ -131,10 +131,10 @@ const long mini_interval = 1000;
     if ((currentMillis - previousMillis_2) >= mini_interval) {
       static int idle_counter=0;
       previousMillis_2 = currentMillis;    
-      Serial.print(" Active fw version:");
-      Serial.println(FirmwareVer);
-      Serial.print("Idle Loop....");
-      Serial.println(idle_counter++);
+      //Serial.print(" Active fw version:");
+      //Serial.println(FirmwareVer);
+      //Serial.print("Idle Loop....");
+      //Serial.println(idle_counter++);
      if(idle_counter%2==0)
       digitalWrite(LED_BUILTIN, HIGH);
      else 
@@ -185,8 +185,6 @@ void configModeCallback (WiFiManager *myWiFiManager) {
 }
 
 void setup() {
-
-  setClock();
   
   WiFi.mode(WIFI_STA); // explicitly set mode, esp defaults to STA+AP
   // put your setup code here, to run once:
@@ -226,6 +224,7 @@ void setup() {
   port.begin(localPort);
   ledstrip.Begin();//Begin output
   ledstrip.Show();//Clear the strip for use
+  setClock();
 }
 uint8_t N = 0;
 #if PRINT_FPS
@@ -234,8 +233,6 @@ uint8_t N = 0;
 #endif
 
 void loop() {
-  //ota call
-  repeatedCall(); 
   // Read data over socket
     int packetSize = port.parsePacket();
     // If packets have been received, interpret the command
@@ -260,5 +257,7 @@ void loop() {
             fpsCounter = 0;
         }   
     #endif
+    //ota call
+    repeatedCall(); 
 
 }
