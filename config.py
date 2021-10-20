@@ -11,7 +11,7 @@ def getHostIP(host):
         ips=[]
     return ips
 
-UDP_IP = ''.join([str(elem) for elem in getHostIP('ESP-6BFDB0.mshome.net')[2]])
+UDP_IP = ''.join([str(elem) for elem in getHostIP('ESP-8980AE.mshome.net')[2]])
 
 """IP address of the ESP8266. Must match IP in ws2812_controller.ino"""
 UDP_PORT = 7777
