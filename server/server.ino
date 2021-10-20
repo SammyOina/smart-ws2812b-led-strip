@@ -10,7 +10,7 @@ BearSSL::CertStore certStore;
 #include <time.h>
 
 // ota tools
-const String FirmwareVer={"1.0"}; 
+const String FirmwareVer={"1.1"}; 
 #define URL_fw_Version "https://raw.githubusercontent.com/SammyOina/smart-ws2812b-led-strip/master/server/version.txt"
 #define URL_fw_Bin "https://raw.githubusercontent.com/SammyOina/smart-ws2812b-led-strip/main/server/firmware.bin"
 const char* host = "raw.githubusercontent.com";
